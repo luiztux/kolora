@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Gruppo&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+@import 'tailwindcss' important;
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* colors */
+  --color-shark-50: #f6f6f6;
+  --color-shark-100: #e7e7e7;
+  --color-shark-200: #d1d1d1;
+  --color-shark-300: #b0b0b0;
+  --color-shark-400: #888888;
+  --color-shark-500: #6d6d6d;
+  --color-shark-600: #5d5d5d;
+  --color-shark-700: #4f4f4f;
+  --color-shark-800: #454545;
+  --color-shark-900: #3d3d3d;
+  --color-shark-950: #232323;
+  /* font */
+  --default-font-family: 'Ubuntu', sans-serif;
+  --font-gruppo: 'Gruppo', sans-serif;
+}
+
+body {
+  background-color: white;
+  color: var(--color-shark-700);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark body {
+  background-color: var(--color-shark-950);
+  color: var(--color-shark-50);
+}
