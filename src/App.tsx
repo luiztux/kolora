@@ -9,7 +9,7 @@ import { App as AntdApp } from 'antd';
 
 export const App = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename='/kolora'>
       <ThemeContextProvider>
         <PaletteContextProvider>
           <MenuContextProvider>
