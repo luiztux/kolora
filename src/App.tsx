@@ -18,6 +18,7 @@ export const App = () => {
         theme={{
           token: {
             colorPrimary: '#432dd7',
+            colorBgSpotlight: '#312c85'
           },
         }}
       >

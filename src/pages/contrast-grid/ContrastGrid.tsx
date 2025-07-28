@@ -3,7 +3,7 @@ import { wcagContrast, parse } from 'culori';
 import { getContrastingTextColor } from '../../utils/paletteGenerator';
 import { RefreshCw } from 'lucide-react';
 import { App, Button, Breadcrumb, Select } from 'antd';
-import { Header, MenuPanel } from '../../components/Components';
+import { Header, GeneralOptionsButton } from '../../components/Components';
 import { usePaletteContext } from '../../contexts/palette/PaletteContext';
 import colorNamer from 'color-namer';
 import { Link } from 'react-router-dom';
@@ -63,7 +63,7 @@ export const ContrastGrid = () => {
 
   return (
     <>
-      <MenuPanel />
+      <GeneralOptionsButton />
       <div
         className='min-h-screen dark:bg-shark-800'
         style={{ backgroundColor: palette.gray[50] }}
@@ -88,7 +88,7 @@ export const ContrastGrid = () => {
           />
         </div>
         <main className='container px-4 py-8'>
-          <div className='flex justify-between items-center mb-6'>
+          <div className='flex flex-col md:flex-row gap-5 md:gap-0 text-center md:text-start md:justify-between items-center mb-6'>
             <h1 className='text-3xl font-semibold dark:text-shark-50'>
               Contrast Grid para {primaryName} e {grayName}
             </h1>
@@ -114,12 +114,12 @@ export const ContrastGrid = () => {
               Cor Base para Análise:
             </span>
             <Select
+              className='w-full md:w-1/4'
               showSearch
               placeholder='Selecione uma cor para analisar'
               optionFilterProp='children'
               onChange={(value) => setSelectedBaseColor(value)}
               value={selectedBaseColor}
-              style={{ width: 300 }}
               options={allColors.map((color) => ({
                 value: color,
                 label: `${

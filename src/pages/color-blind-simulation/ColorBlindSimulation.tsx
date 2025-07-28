@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Header, MenuPanel } from '../../components/Components';
+import { Header, GeneralOptionsButton } from '../../components/Components';
 import { usePaletteContext } from '../../contexts/palette/PaletteContext';
 import {
   getContrastingTextColor,
@@ -45,28 +45,22 @@ const ColorScaleRow = ({
       <h3 className='text-lg font-semibold mb-2' style={{ color: scale[800] }}>
         {title}
       </h3>
-      <div className='flex flex-wrap -mx-1'>
+      <div className='grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-3'>
         {Object.entries(scale).map(([step, color]) => {
+          const textColor = getContrastingTextColor(color as string);
           return (
-            <div key={step} className='w-1/6 p-1 md:w-[calc(100%/11)]'>
-              <div
-                className='w-full h-16 rounded-lg shadow-inner flex flex-col items-center justify-center p-1 cursor-pointer'
-                style={{ backgroundColor: color as string }}
-                onClick={() => handleCopyColor(color as string)}
-              >
-                <span
-                  className='font-bold text-xs'
-                  style={{ color: getContrastingTextColor(color as string) }}
-                >
-                  {step}
-                </span>
-                <span
-                  className='font-mono text-xs opacity-75'
-                  style={{ color: getContrastingTextColor(color as string) }}
-                >
-                  {color as string} {/* Alterado para exibir o hex direto */}
-                </span>
-              </div>
+            <div
+              key={step}
+              className="rounded-lg shadow-inner p-2 cursor-pointer transition-transform hover:scale-[1.03] active:scale-95"
+              style={{ backgroundColor: color as string }}
+              onClick={() => handleCopyColor(color as string)}
+            >
+              <span className="block text-xs font-bold" style={{ color: textColor }}>
+                {step}
+              </span>
+              <span className="block font-mono text-xs opacity-80" style={{ color: textColor }}>
+                {color as string}
+              </span>
             </div>
           );
         })}
@@ -151,7 +145,7 @@ export const ColorBlindSimulation = () => {
 
   return (
     <>
-      <MenuPanel />
+      <GeneralOptionsButton />
       <div className='sticky top-0 z-50 bg-white dark:bg-shark-800 shadow-sm'>
         <Header />
       </div>
@@ -160,7 +154,7 @@ export const ColorBlindSimulation = () => {
         style={{ backgroundColor: palette.gray[50] }}
       >
         <main className='container mx-auto px-4 py-8'>
-          <div className=' px-4 my-4'>
+          <div className='px-4 my-4'>
             <Breadcrumb
               items={[
                 {
@@ -190,7 +184,7 @@ export const ColorBlindSimulation = () => {
             </p>
           </section>
 
-          <div className='flex justify-between items-center mb-6'>
+          <div className='flex flex-col md:flex-row gap-5 md:gap-0 text-center md:text-start justify-between items-center mb-6'>
             <h1
               className='text-3xl font-bold dark:text-shark-50'
               style={{ color: palette.gray[900] }}
@@ -214,7 +208,7 @@ export const ColorBlindSimulation = () => {
           <div className='mb-6'>
             <Select
               placeholder='Selecione um tipo de daltonismo'
-              style={{ width: 300 }}
+              className='w-full md:w-1/4'
               onChange={(value) => setSelectedType(value)}
               options={[
                 { value: 'Normal', label: 'Visão Normal' },

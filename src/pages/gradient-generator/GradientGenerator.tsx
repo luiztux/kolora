@@ -14,12 +14,15 @@ import {
 } from 'antd';
 import { Ellipsis, RefreshCw, Maximize2, Minimize2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Header, MenuPanel } from '../../components/Components';
+import { Header, GeneralOptionsButton } from '../../components/Components';
 import { toPng } from 'html-to-image';
 import download from 'downloadjs';
+import { useMediaQuery } from 'react-responsive';
 
 export const GradientGenerator = () => {
   const { message: messageApi } = App.useApp();
+
+  const isMobile = useMediaQuery({ query: '(max-width: 48rem)'})
 
   // Estado de HSL para cada cor
   const [hsl1, setHsl1] = useState({ h: Math.random() * 360, s: 1, l: 0.5 });
@@ -51,8 +54,15 @@ export const GradientGenerator = () => {
   };
 
   const handleExportPng = async () => {
-    const node = document.getElementById('gradient-preview');
-    if (!node) return;
+    const previewId = isMobile
+      ? 'gradient-preview-mobile'
+      : 'gradient-preview-desktop';
+    const node = document.getElementById(previewId);
+
+    if (!node) {
+      messageApi.error('Elemento do gradiente não encontrado!');
+      return;
+    }
 
     try {
       const dataUrl = await toPng(node);
@@ -155,7 +165,7 @@ export const GradientGenerator = () => {
 
   return (
     <>
-      <MenuPanel />
+      <GeneralOptionsButton />
       <div className='min-h-screen bg-gray-100 dark:bg-shark-800'>
         <div className='sticky top-0 z-50 bg-white dark:bg-shark-800 shadow-sm'>
           <Header />
@@ -169,9 +179,26 @@ export const GradientGenerator = () => {
           />
         </div>
 
-        <main className='container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8'>
+        <main className='container mx-auto flex flex-col gap-8 px-4 py-8 md:flex-row'>
+          {/* Visualização para Mobile */}
+          {isMobile && (
+            <div className='relative h-80 overflow-hidden rounded-lg bg-gray-200 shadow-md'>
+              <div
+                id='gradient-preview-mobile'
+                className='h-full w-full'
+                style={{ background: gradientCss }}
+              ></div>
+              <Button
+                type='text'
+                icon={<Maximize2 size={20} />}
+                className='absolute right-2 top-2 text-white hover:text-gray-300'
+                onClick={() => setIsDrawerOpen(true)}
+              />
+            </div>
+          )}
+
           {/* Painel de controles */}
-          <div className='flex-1 bg-white dark:bg-shark-700 p-6 rounded-lg shadow space-y-6'>
+          <div className='flex-1 space-y-6 rounded-lg bg-white p-6 shadow dark:bg-shark-700'>
             <h1 className='text-2xl font-bold text-shark-900 dark:text-white'>
               Gerador de Gradientes
             </h1>
@@ -255,7 +282,7 @@ export const GradientGenerator = () => {
             })}
 
             <div>
-              <span className='block text-lg font-semibold mb-2 text-shark-800 dark:text-white'>
+              <span className='mb-2 block text-lg font-semibold text-shark-800 dark:text-white'>
                 Tipo de Gradiente
               </span>
               <Select
@@ -271,7 +298,7 @@ export const GradientGenerator = () => {
 
             {gradientType === 'linear' && (
               <div>
-                <span className='block text-lg font-semibold mb-2 text-shark-800 dark:text-white'>
+                <span className='mb-2 block text-lg font-semibold text-shark-800 dark:text-white'>
                   Rotação ({rotation}°)
                 </span>
                 <Slider
@@ -285,7 +312,7 @@ export const GradientGenerator = () => {
 
             {gradientType === 'radial' && (
               <div>
-                <span className='block text-lg font-semibold mb-2 text-shark-800 dark:text-white'>
+                <span className='mb-2 block text-lg font-semibold text-shark-800 dark:text-white'>
                   Posição ({position}%)
                 </span>
                 <Slider
@@ -323,20 +350,22 @@ export const GradientGenerator = () => {
             </div>
           </div>
 
-          {/* Visualização */}
-          <div className='flex-1 bg-gray-200 rounded-lg shadow-md relative overflow-hidden'>
-            <div
-              id='gradient-preview'
-              className='w-full h-full'
-              style={{ background: gradientCss }}
-            ></div>
-            <Button
-              type='text'
-              icon={<Maximize2 size={20} />}
-              className='absolute top-2 right-2 text-white hover:text-gray-300'
-              onClick={() => setIsDrawerOpen(true)}
-            />
-          </div>
+          {/* Visualização para Desktop */}
+          {!isMobile && (
+            <div className='relative flex-1 overflow-hidden rounded-lg bg-gray-200 shadow-md'>
+              <div
+                id='gradient-preview-desktop'
+                className='h-full w-full'
+                style={{ background: gradientCss }}
+              ></div>
+              <Button
+                type='text'
+                icon={<Maximize2 size={20} />}
+                className='absolute right-2 top-2 text-white hover:text-gray-300'
+                onClick={() => setIsDrawerOpen(true)}
+              />
+            </div>
+          )}
         </main>
 
         {/* Drawer em tela cheia */}

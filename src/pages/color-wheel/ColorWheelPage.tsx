@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import {
   Header,
   ColorWheelExportButton,
-  MenuPanel,
+  GeneralOptionsButton,
 } from '../../components/Components';
 import { getContrastingTextColor } from '../../utils/paletteGenerator';
 import { Button, Breadcrumb, Select, Input, App } from 'antd';
@@ -135,7 +135,7 @@ export const ColorWheelPage = () => {
 
   return (
     <>
-      <MenuPanel />
+      <GeneralOptionsButton />
       <div className='sticky top-0 z-50 bg-white dark:bg-shark-800 shadow-sm'>
         <Header />
       </div>

@@ -5,3 +5,4 @@ export { ColorWheelExportButton } from './buttons/ColorWheelExportButton';
 export { MenuButton } from './buttons/MenuButton';
 export { MenuPanel } from './panels/MenuPanel';
 export { ExportModalContent } from './modals/ExportModalContent';
+export { GeneralOptionsButton } from './buttons/GeneralOptionsButton';

@@ -1,4 +1,4 @@
-import { MenuButton, ThemeSwitcherButton } from '../Components';
+import { ThemeSwitcherButton } from '../Components';
 import { useThemeContext } from '../../contexts/Contexts';
 import { Link } from 'react-router-dom';
 import { logo, logoWhite } from '../../assets/Assets';
@@ -23,7 +23,6 @@ export const Header = () => {
       </div>
       <div className='inline-flex items-center gap-4'>
         <ThemeSwitcherButton />
-        <MenuButton />
       </div>
     </div>
   );
