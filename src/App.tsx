@@ -12,7 +12,7 @@ import locale from 'antd/locale/pt_BR';
 
 export const App = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename='/kolora'>
       <ConfigProvider
         locale={locale}
         theme={{

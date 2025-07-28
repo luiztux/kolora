@@ -56,29 +56,25 @@ const ColorScaleRow = ({ title, scale }: { title: string; scale: any }) => {
       <h3 className='text-lg font-semibold mb-2' style={{ color: scale[800] }}>
         {title}
       </h3>
-      <div className='flex flex-wrap -mx-1'>
-        {Object.entries(scale).map(([step, color]) => (
-          <div key={step} className='w-1/6 p-1 md:w-[calc(100%/11)]'>
+      <div className='grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-3'>
+        {Object.entries(scale).map(([step, color]) => {
+          const textColor = getContrastingTextColor(color as string);
+          return (
             <div
-              className='w-full h-16 rounded-lg shadow-inner flex flex-col items-center justify-center p-1 cursor-pointer'
+              key={step}
+              className="rounded-lg shadow-inner p-2 cursor-pointer transition-transform hover:scale-[1.03] active:scale-95"
               style={{ backgroundColor: color as string }}
               onClick={() => handleCopyColor(color as string)}
             >
-              <span
-                className='font-bold text-xs'
-                style={{ color: getContrastingTextColor(color as string) }}
-              >
+              <span className="block text-xs font-bold" style={{ color: textColor }}>
                 {step}
               </span>
-              <span
-                className='font-mono text-xs opacity-75'
-                style={{ color: getContrastingTextColor(color as string) }}
-              >
+              <span className="block font-mono text-xs opacity-80" style={{ color: textColor }}>
                 {color as string}
               </span>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -359,7 +355,7 @@ export const Home = () => {
               <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                 {/* Exemplo de Botões */}
                 <Card title="Botões">
-                  <div className='flex gap-4'>
+                  <div className='flex flex-wrap gap-4'>
                     <Button type="primary">Botão Primário</Button>
                     <Button>Botão Padrão</Button>
                     <Button type="dashed">Botão Tracejado</Button>
