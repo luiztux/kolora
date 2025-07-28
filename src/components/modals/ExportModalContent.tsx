@@ -20,7 +20,7 @@ import {
 } from '../../utils/exportGenerator';
 
 const { TextArea } = Input;
-const { Paragraph, Title } = Typography;
+const { Paragraph} = Typography;
 
 export const ExportModalContent = () => {
   const { isExportModalOpen, paletteToExport, closeExportModal } = useExportPanelContext();

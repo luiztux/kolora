@@ -50,7 +50,7 @@ export const generateTailwindCss = (
 
   const formatScale = (scale: any) =>
     Object.entries(scale)
-      .map(([step, color]) => `${step}: '${formatColor(color, colorFormat)}',`)
+      .map(([step, color]) => `${step}: '${formatColor(color as string, colorFormat)}',`)
       .join('\n          ');
 
   if (version === 'v3') {
@@ -123,8 +123,7 @@ export const generateJson = (palette: ExportablePalette) =>
 
 
 export const generatePaletteSvg = (
-  palette: ExportablePalette,
-  format: 'hex' | 'rgb' | 'hsl' = 'hex'
+  palette: ExportablePalette
 ): string => {
   const swatchSize = 60;
   const gap = 10;

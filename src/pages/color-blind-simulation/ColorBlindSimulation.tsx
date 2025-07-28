@@ -78,6 +78,7 @@ const ColorScaleRow = ({
 export const ColorBlindSimulation = () => {
   const { palette, generateNewPalette } = usePaletteContext();
   const [selectedType, setSelectedType] = useState<string | null>(null);
+  const { message: messageApi } = App.useApp();
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -113,7 +114,7 @@ export const ColorBlindSimulation = () => {
     // 3. Aplica a simulação de daltonismo de forma segura
     const methodKey = type.toLowerCase() as ColorBlindnessMethodKey;
     if (!(methodKey in colorBlind)) {
-      message.warning(`Método de simulação de daltonismo desconhecido: ${type}`);
+      messageApi.warning(`Método de simulação de daltonismo desconhecido: ${type}`);
       return color; // Retorna a cor original se o método não existir
     }
     // Afirmação de tipo para garantir que o TypeScript entenda o acesso

@@ -1,4 +1,4 @@
-import { App, Button, Dropdown, type MenuProps } from 'antd';
+import { Button, Dropdown, type MenuProps } from 'antd';
 import { Link } from 'react-router-dom';
 import { Blend, Download, Ellipsis, Eye, Grid3x3, PaintRoller } from 'lucide-react';
 import { usePaletteContext } from '../../contexts/palette/PaletteContext';
