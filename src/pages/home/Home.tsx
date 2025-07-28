@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import {
   Header,
   MenuPanel,
+  ExportModalContent,
   PaletteOptionsButton,
 } from '../../components/Components';
 import { getContrastingTextColor } from '../../utils/paletteGenerator';
@@ -293,6 +294,7 @@ export const Home = () => {
   return (
     <>
       <MenuPanel />
+      <ExportModalContent />
       <div className='sticky top-0 z-50 bg-white dark:bg-shark-800 shadow-sm w-full'>
         <Header />
       </div>

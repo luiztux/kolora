@@ -4,3 +4,4 @@ export { PaletteOptionsButton } from './buttons/PaletteOptionsButton';
 export { ColorWheelExportButton } from './buttons/ColorWheelExportButton';
 export { MenuButton } from './buttons/MenuButton';
 export { MenuPanel } from './panels/MenuPanel';
+export { ExportModalContent } from './modals/ExportModalContent';

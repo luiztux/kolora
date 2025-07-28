@@ -78,7 +78,6 @@ const ColorScaleRow = ({
 export const ColorBlindSimulation = () => {
   const { palette, generateNewPalette } = usePaletteContext();
   const [selectedType, setSelectedType] = useState<string | null>(null);
-  const { message: messageApi } = App.useApp();
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -114,7 +113,7 @@ export const ColorBlindSimulation = () => {
     // 3. Aplica a simulação de daltonismo de forma segura
     const methodKey = type.toLowerCase() as ColorBlindnessMethodKey;
     if (!(methodKey in colorBlind)) {
-      messageApi.warning(`Método de simulação de daltonismo desconhecido: ${type}`);
+      message.warning(`Método de simulação de daltonismo desconhecido: ${type}`);
       return color; // Retorna a cor original se o método não existir
     }
     // Afirmação de tipo para garantir que o TypeScript entenda o acesso
@@ -132,7 +131,7 @@ export const ColorBlindSimulation = () => {
     if (!selectedType || selectedType === 'Normal') return palette;
 
     const newPalette = { ...palette };
-    for (const scaleName of Object.keys(palette) as (keyof typeof palette)[]) {
+    for (const scaleName of Object.keys(palette) as (keyof typeof palette)[]) { // Afirmação de tipo aqui
       newPalette[scaleName] = Object.fromEntries(
         Object.entries(palette[scaleName]).map(
           ([step, color]) => [
@@ -263,7 +262,7 @@ export const ColorBlindSimulation = () => {
         </main>
 
         <footer
-          className='text-center py-12 dark:text-shark-50'
+          className='text-center py-12'
           style={{ color: palette.gray[500] }}
         >
           <p>Feito com 💜 para a comunidade open source.</p>

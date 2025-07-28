@@ -2,34 +2,18 @@ import { App, Button, Dropdown, type MenuProps } from 'antd';
 import { Link } from 'react-router-dom';
 import { Blend, Download, Ellipsis, Eye, Grid3x3, PaintRoller } from 'lucide-react';
 import { usePaletteContext } from '../../contexts/palette/PaletteContext';
+import { useExportPanelContext } from '../../contexts/panels/ExportPanelContext'; // Importa o novo contexto
 import namer from 'color-namer';
 
 export const PaletteOptionsButton = () => {
   const { palette } = usePaletteContext();
+  const { openExportModal } = useExportPanelContext(); // Usa o novo hook
+
   let primaryName = namer(palette.primary[500]).ntc[0].name;
   let grayName = namer(palette.gray[500]).ntc[0].name;
-  const { message: messageApi } = App.useApp();
 
   primaryName = primaryName.replace(/\s/g, '-').toLowerCase();
   grayName = grayName.replace(/\s/g, '-').toLowerCase();
-
-  const handleExport = () => {
-    let content = '';
-    const formatName = 'TailwindCSS v4 (CSS Variables)';
-
-    content = `@theme {\n${Object.entries(palette.primary)
-      .map(([step, color]) => `  --color-${primaryName}-${step}: ${color};`)
-      .join('\n')}\n${Object.entries(palette.gray)
-      .map(([step, color]) => `  --color-${grayName}-${step}: ${color};`)
-      .join('\n')}\n}\n/* Use em seu CSS: var(--color-${primaryName}-500) */`;
-
-    if (content) {
-      navigator.clipboard.writeText(content);
-      messageApi.success(`${formatName} copiado para a área de transferência!`);
-    } else {
-      messageApi.error('Erro ao gerar conteúdo para exportação.');
-    }
-  };
 
   const options: MenuProps['items'] = [
     {
@@ -46,7 +30,7 @@ export const PaletteOptionsButton = () => {
         <Button
           ghost
           className='border-none pl-0 text-shark-600'
-          onClick={handleExport}
+          onClick={() => openExportModal({...palette})}
         >
           Exportar
         </Button>
