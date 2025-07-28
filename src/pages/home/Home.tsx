@@ -44,8 +44,14 @@ import {
   Cell
 } from 'recharts';
 
+type TailwindStep =
+  | '50' | '100' | '200' | '300' | '400'
+  | '500' | '600' | '700' | '800' | '900';
+
+type ColorScale = Record<TailwindStep, string>;
+
 // Componente para renderizar uma única linha de escala de cores
-const ColorScaleRow = ({ title, scale }: { title: string; scale: any }) => {
+const ColorScaleRow = ({ title, scale }: { title: string; scale: ColorScale }) => {
   const handleCopyColor = (color: string) => {
     navigator.clipboard.writeText(color);
     message.success(`Cor ${color.toUpperCase()} copiada!`);
