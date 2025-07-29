@@ -1,6 +1,14 @@
-import { Button, Dropdown, type MenuProps } from 'antd';
+import { App, Button, Dropdown, type MenuProps } from 'antd';
 import { Link } from 'react-router-dom';
-import { Blend, Download, Ellipsis, Eye, Grid3x3, PaintRoller } from 'lucide-react';
+import {
+  Blend,
+  Clipboard,
+  Download,
+  Ellipsis,
+  Eye,
+  Grid3x3,
+  PaintRoller,
+} from 'lucide-react';
 import { usePaletteContext } from '../../contexts/palette/PaletteContext';
 import { useExportPanelContext } from '../../contexts/panels/ExportPanelContext';
 import namer from 'color-namer';
@@ -13,9 +21,12 @@ interface PaletteOptionsButtonProps {
   };
 }
 
-export const PaletteOptionsButton = ({ palette: paletteFromProp }: PaletteOptionsButtonProps) => {
+export const PaletteOptionsButton = ({
+  palette: paletteFromProp,
+}: PaletteOptionsButtonProps) => {
   const { palette: paletteFromContext } = usePaletteContext();
   const { openExportModal } = useExportPanelContext();
+  const { message: messageApi } = App.useApp();
 
   const palette = paletteFromProp || paletteFromContext;
 
@@ -25,7 +36,34 @@ export const PaletteOptionsButton = ({ palette: paletteFromProp }: PaletteOption
   primaryName = primaryName.replace(/\s/g, '-').toLowerCase();
   grayName = grayName.replace(/\s/g, '-').toLowerCase();
 
+  const copyPalette = async (
+    palette: Record<string, Record<string, string>>,
+    primaryName: string,
+    grayName: string
+  ) => {
+    const renamedPalette = {
+      [primaryName]: palette.primary,
+      [grayName]: palette.gray,
+    };
+    const formatted = `// Paleta gerada no Kolora\n${JSON.stringify(renamedPalette, null, 2)}`;
+    await navigator.clipboard.writeText(formatted);
+    messageApi.success('Paleta copiada');
+  };
+
   const options: MenuProps['items'] = [
+    {
+      label: (
+        <Button
+          ghost
+          className='border-none pl-0 text-shark-600'
+          onClick={() => copyPalette(palette, primaryName, grayName)}
+        >
+          Copiar paleta
+        </Button>
+      ),
+      key: 'Copiar paleta',
+      icon: <Clipboard size={15} className='text-shark-600' />,
+    },
     {
       label: (
         <Link to='/contrast-grid' className='text-shark-600'>
@@ -40,7 +78,7 @@ export const PaletteOptionsButton = ({ palette: paletteFromProp }: PaletteOption
         <Button
           ghost
           className='border-none pl-0 text-shark-600'
-          onClick={() => openExportModal({...palette})}
+          onClick={() => openExportModal({ ...palette })}
         >
           Exportar
         </Button>
@@ -58,23 +96,23 @@ export const PaletteOptionsButton = ({ palette: paletteFromProp }: PaletteOption
       icon: <Eye size={15} className='text-shark-600' />,
     },
     {
-    label: (
-      <Link to='/color-wheel' className='text-shark-600'>
-        Color Wheel
-      </Link>
-    ),
-    key: 'Color Wheel',
-    icon: <Blend size={15} className='text-shark-600' />,
-  },
-  {
-    label: (
-      <Link to='/gradient-generator' className='text-shark-600'>
-        Gradient Generator
-      </Link>
-    ),
-    key: 'Gradient Generator',
-    icon: <PaintRoller size={15} className='text-shark-600' />,
-  },
+      label: (
+        <Link to='/color-wheel' className='text-shark-600'>
+          Color Wheel
+        </Link>
+      ),
+      key: 'Color Wheel',
+      icon: <Blend size={15} className='text-shark-600' />,
+    },
+    {
+      label: (
+        <Link to='/gradient-generator' className='text-shark-600'>
+          Gradient Generator
+        </Link>
+      ),
+      key: 'Gradient Generator',
+      icon: <PaintRoller size={15} className='text-shark-600' />,
+    },
   ];
 
   return (
