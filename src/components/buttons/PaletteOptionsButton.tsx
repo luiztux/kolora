@@ -2,12 +2,22 @@ import { Button, Dropdown, type MenuProps } from 'antd';
 import { Link } from 'react-router-dom';
 import { Blend, Download, Ellipsis, Eye, Grid3x3, PaintRoller } from 'lucide-react';
 import { usePaletteContext } from '../../contexts/palette/PaletteContext';
-import { useExportPanelContext } from '../../contexts/panels/ExportPanelContext'; // Importa o novo contexto
+import { useExportPanelContext } from '../../contexts/panels/ExportPanelContext';
 import namer from 'color-namer';
+import type { ColorScale } from '../../utils/paletteGenerator';
 
-export const PaletteOptionsButton = () => {
-  const { palette } = usePaletteContext();
-  const { openExportModal } = useExportPanelContext(); // Usa o novo hook
+interface PaletteOptionsButtonProps {
+  palette?: {
+    primary: ColorScale;
+    gray: ColorScale;
+  };
+}
+
+export const PaletteOptionsButton = ({ palette: paletteFromProp }: PaletteOptionsButtonProps) => {
+  const { palette: paletteFromContext } = usePaletteContext();
+  const { openExportModal } = useExportPanelContext();
+
+  const palette = paletteFromProp || paletteFromContext;
 
   let primaryName = namer(palette.primary[500]).ntc[0].name;
   let grayName = namer(palette.gray[500]).ntc[0].name;

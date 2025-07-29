@@ -1,11 +1,11 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Header,
   ExportModalContent,
   GeneralOptionsButton,
   PaletteOptionsButton,
 } from '../../components/Components';
-import { getContrastingTextColor } from '../../utils/paletteGenerator';
+import { getContrastingTextColor, generatePaletteFromColor, generateColorScale, type ColorScale } from '../../utils/paletteGenerator';
 import { RefreshCw } from 'lucide-react';
 import {
   Button,
@@ -43,15 +43,10 @@ import {
   Pie,
   Cell
 } from 'recharts';
-
-type TailwindStep =
-  | '50' | '100' | '200' | '300' | '400'
-  | '500' | '600' | '700' | '800' | '900';
-
-type ColorScale = Record<TailwindStep, string>;
+import { parse, converter } from 'culori';
 
 // Componente para renderizar uma única linha de escala de cores
-const ColorScaleRow = ({ title, scale }: { title: string; scale: ColorScale }) => {
+const ColorScaleRow = ({ title, scale, palette }: { title: string; scale: ColorScale; palette: any }) => {
   const handleCopyColor = (color: string) => {
     navigator.clipboard.writeText(color);
     message.success(`Cor ${color.toUpperCase()} copiada!`);
@@ -59,9 +54,12 @@ const ColorScaleRow = ({ title, scale }: { title: string; scale: ColorScale }) =
 
   return (
     <div>
-      <h3 className='text-lg font-semibold mb-2' style={{ color: scale[800] }}>
-        {title}
-      </h3>
+      <div className="flex justify-between items-center mb-2">
+        <h3 className='text-lg font-semibold' style={{ color: scale[800] }}>
+          {title}
+        </h3>
+        {/* <PaletteOptionsButton palette={palette} /> */}
+      </div>
       <div className='grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-3'>
         {Object.entries(scale).map(([step, color]) => {
           const textColor = getContrastingTextColor(color as string);
@@ -96,10 +94,16 @@ const data = [
   { name: 'Jul', uv: 3490, pv: 4300, amt: 2100 },
 ];
 
+const toOklch = converter('oklch');
+
 export const Home = () => {
   const { palette, generateNewPalette } = usePaletteContext();
+  const [customColor, setCustomColor] = useState('');
+  const [customPalette, setCustomPalette] = useState<{ primary: ColorScale, gray: ColorScale } | null>(null);
+
   const primaryName = namer(palette.primary[500]).ntc[0].name;
   const grayName = namer(palette.gray[500]).ntc[0].name;
+
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -115,6 +119,22 @@ export const Home = () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [generateNewPalette]);
+
+  useEffect(() => {
+    if (customColor) {
+      const newPalette = generatePaletteFromColor(customColor);
+      if (newPalette) {
+        const oklch = toOklch(parse(customColor));
+        const grayScale = generateColorScale(oklch.h, 0.05);
+        setCustomPalette({ primary: newPalette, gray: grayScale });
+      }
+       else {
+        setCustomPalette(null);
+      }
+    } else {
+      setCustomPalette(null);
+    }
+  }, [customColor]);
 
   // Cria um tema dinâmico para o Ant Design sempre que a paleta mudar
   const antdTheme = useMemo(() => ({
@@ -336,6 +356,27 @@ export const Home = () => {
         </header>
 
         <main className='container mx-auto px-4'>
+          <div className='mb-8'>
+            <Card
+              title={<span className='dark:text-shark-50 text-shark-600'>Gerar Paleta a partir de uma cor</span>}
+              className='bg-white dark:bg-shark-700 border-none text-shark-800 dark:text-white'
+            >
+              <Input
+                placeholder="Insira uma cor (ex: #ff0000, rgb(255, 0, 0), etc.)"
+                size="large"
+                value={customColor}
+                onChange={(e) => setCustomColor(e.target.value)}
+              />
+              {customPalette && (
+                <div className='mt-6'>
+                  <div>
+                    <PaletteOptionsButton palette={customPalette} />
+                  </div>
+                  <ColorScaleRow title={namer(customPalette?.primary[500]).ntc[0].name} scale={customPalette.primary} palette={customPalette} />
+                </div>
+              )}
+            </Card>
+          </div>
           <div>
             <PaletteOptionsButton />
           </div>
@@ -344,8 +385,8 @@ export const Home = () => {
             style={{ backgroundColor: palette.gray[100] }}
           >
             <div className='space-y-6'>
-              <ColorScaleRow title={primaryName} scale={palette.primary} />
-              <ColorScaleRow title={grayName} scale={palette.gray} />
+              <ColorScaleRow title={primaryName} scale={palette.primary} palette={palette} />
+              <ColorScaleRow title={grayName} scale={palette.gray} palette={palette} />
             </div>
           </div>
 
