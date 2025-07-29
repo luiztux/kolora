@@ -46,7 +46,7 @@ import {
 import { parse, converter } from 'culori';
 
 // Componente para renderizar uma única linha de escala de cores
-const ColorScaleRow = ({ title, scale, palette }: { title: string; scale: ColorScale; palette: any }) => {
+const ColorScaleRow = ({ title, scale }: { title: string; scale: ColorScale; palette: any }) => {
   const handleCopyColor = (color: string) => {
     navigator.clipboard.writeText(color);
     message.success(`Cor ${color.toUpperCase()} copiada!`);
@@ -58,7 +58,6 @@ const ColorScaleRow = ({ title, scale, palette }: { title: string; scale: ColorS
         <h3 className='text-lg font-semibold' style={{ color: scale[800] }}>
           {title}
         </h3>
-        {/* <PaletteOptionsButton palette={palette} /> */}
       </div>
       <div className='grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-3'>
         {Object.entries(scale).map(([step, color]) => {
@@ -120,21 +119,25 @@ export const Home = () => {
     };
   }, [generateNewPalette]);
 
-  useEffect(() => {
-    if (customColor) {
-      const newPalette = generatePaletteFromColor(customColor);
-      if (newPalette) {
-        const oklch = toOklch(parse(customColor));
+useEffect(() => {
+  if (customColor) {
+    const newPalette = generatePaletteFromColor(customColor);
+    if (newPalette) {
+      const parsed = parse(customColor);
+      const oklch = parsed ? toOklch(parsed) : null;
+
+      if (oklch && typeof oklch.h === 'number') {
         const grayScale = generateColorScale(oklch.h, 0.05);
         setCustomPalette({ primary: newPalette, gray: grayScale });
-      }
-       else {
+      } else {
         setCustomPalette(null);
       }
     } else {
       setCustomPalette(null);
     }
-  }, [customColor]);
+  }
+}, [customColor]);
+
 
   // Cria um tema dinâmico para o Ant Design sempre que a paleta mudar
   const antdTheme = useMemo(() => ({

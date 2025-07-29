@@ -21,7 +21,6 @@ import {
   App,
   Breadcrumb,
   ColorPicker,
-  theme,
 } from 'antd';
 import type { Color } from 'antd/es/color-picker';
 import { Header, GeneralOptionsButton } from '../../components/Components';
@@ -103,10 +102,10 @@ export const ColorConverter = () => {
       if (parsed) {
         setColor(toOklch(parsed));
       } else {
-        setColor(toOklch('black'));
+        setColor(toOklch('black') ?? null);
       }
     } catch {
-      setColor(toOklch('black'));
+      setColor(toOklch('black') ?? null);
     }
   }, [inputColor]);
 
