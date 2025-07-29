@@ -13,6 +13,7 @@ import { usePaletteContext } from '../../contexts/palette/PaletteContext';
 import { useExportPanelContext } from '../../contexts/panels/ExportPanelContext';
 import namer from 'color-namer';
 import type { ColorScale } from '../../utils/paletteGenerator';
+import type { TailwindPalette } from '../../contexts/palette/PaletteContext';
 
 interface PaletteOptionsButtonProps {
   palette?: {
@@ -36,19 +37,23 @@ export const PaletteOptionsButton = ({
   primaryName = primaryName.replace(/\s/g, '-').toLowerCase();
   grayName = grayName.replace(/\s/g, '-').toLowerCase();
 
-  const copyPalette = async (
-    palette: Record<string, Record<string, string>>,
-    primaryName: string,
-    grayName: string
-  ) => {
-    const renamedPalette = {
+  const copyPalette = (
+  palette: TailwindPalette,
+  primaryName: string,
+  grayName: string
+) => {
+  const formatted = JSON.stringify(
+    {
       [primaryName]: palette.primary,
       [grayName]: palette.gray,
-    };
-    const formatted = `// Paleta gerada no Kolora\n${JSON.stringify(renamedPalette, null, 2)}`;
-    await navigator.clipboard.writeText(formatted);
-    messageApi.success('Paleta copiada');
-  };
+    },
+    null,
+    2
+  );
+  navigator.clipboard.writeText(formatted);
+  messageApi.success('Paleta copiada');
+};
+
 
   const options: MenuProps['items'] = [
     {

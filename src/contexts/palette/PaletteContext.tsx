@@ -5,7 +5,7 @@ import {
 } from '../../utils/paletteGenerator';
 
 // Define a estrutura da nossa paleta Tailwind
-interface TailwindPalette {
+export interface TailwindPalette {
   primary: ColorScale;
   gray: ColorScale;
 }
