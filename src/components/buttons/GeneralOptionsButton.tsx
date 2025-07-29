@@ -7,6 +7,7 @@ import {
   House,
   PaintRoller,
   Layers,
+  SwatchBook
 } from 'lucide-react';
 import { usePaletteContext } from '../../contexts/Contexts';
 import { useMemo, useRef, useCallback } from 'react';
@@ -115,9 +116,19 @@ export const GeneralOptionsButton = () => {
         action: generateNewPalette,
       },
       {
+        icon: <SwatchBook size={15} className='text-shark-600' />,
+        label: 'Conversor de Cores',
+        href: '/color-converter',
+      },
+      {
         icon: <PaintRoller size={15} className='text-shark-600' />,
         label: 'Gradient Generator',
         href: '/gradient-generator',
+      },
+      {
+        icon: <PaintRoller size={15} className='text-shark-600' />,
+        label: 'Color Converter',
+        href: '/color-converter',
       },
       {
         icon: <Blend size={15} className='text-shark-600' />,

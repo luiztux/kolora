@@ -1,4 +1,4 @@
-import { Home, ContrastGrid, ColorBlindSimulation, ColorWheelPage, GradientGenerator } from './Pages';
+import { Home, ContrastGrid, ColorBlindSimulation, ColorWheelPage, GradientGenerator, ColorConverter } from './Pages';
 
 type PagesRouterType = {
     element: React.ReactElement;
@@ -31,5 +31,10 @@ export const pagesRouter: PagesRouterType[] = [
         element: <GradientGenerator />,
         path: '/gradient-generator',
         title: 'Gradient Generator'
+    },
+    {
+        element: <ColorConverter />,
+        path: '/color-converter',
+        title: 'Color Converter'
     },
 ];
