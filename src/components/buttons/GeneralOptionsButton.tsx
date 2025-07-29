@@ -126,11 +126,6 @@ export const GeneralOptionsButton = () => {
         href: '/gradient-generator',
       },
       {
-        icon: <PaintRoller size={15} className='text-shark-600' />,
-        label: 'Color Converter',
-        href: '/color-converter',
-      },
-      {
         icon: <Blend size={15} className='text-shark-600' />,
         label: 'Color Wheel',
         href: '/color-wheel',
