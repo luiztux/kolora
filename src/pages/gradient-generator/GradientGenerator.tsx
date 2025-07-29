@@ -374,7 +374,7 @@ export const GradientGenerator = () => {
           onClose={() => setIsDrawerOpen(false)}
           footer={null}
           placement='bottom'
-          height='100vh'
+          height='100dvh'
           closable={false}
           maskClosable
           styles={{
@@ -392,7 +392,7 @@ export const GradientGenerator = () => {
           >
             <Button
               ghost
-              className='border-none pr-2 pt-2'
+              className='border-none pr-2 pt-2 z-10'
               icon={<Minimize2 size={20} className='text-white' />}
               onClick={() => setIsDrawerOpen(false)}
             />
