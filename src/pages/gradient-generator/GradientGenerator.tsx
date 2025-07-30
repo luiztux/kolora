@@ -22,7 +22,7 @@ import { useMediaQuery } from 'react-responsive';
 export const GradientGenerator = () => {
   const { message: messageApi } = App.useApp();
 
-  const isMobile = useMediaQuery({ query: '(max-width: 48rem)'})
+  const isMobile = useMediaQuery({ query: '(max-width: 48rem)' });
 
   // Estado de HSL para cada cor
   const [hsl1, setHsl1] = useState({ h: Math.random() * 360, s: 1, l: 0.5 });
@@ -173,8 +173,18 @@ export const GradientGenerator = () => {
         <div className='px-4 my-4'>
           <Breadcrumb
             items={[
-              { title: <Link to='/' className='dark:text-shark-50'>Home</Link> },
-              { title: <span className='dark:text-shark-50'>Gradient Generator</span> },
+              {
+                title: (
+                  <Link to='/' className='dark:text-shark-50'>
+                    Home
+                  </Link>
+                ),
+              },
+              {
+                title: (
+                  <span className='dark:text-shark-50'>Gradient Generator</span>
+                ),
+              },
             ]}
           />
         </div>
@@ -203,6 +213,30 @@ export const GradientGenerator = () => {
               Gerador de Gradientes
             </h1>
 
+            <div className='flex gap-4'>
+              <Button
+                icon={<RefreshCw size={16} />}
+                onClick={generateRandomColors}
+              >
+                Cores Aleatórias
+              </Button>
+              <Dropdown
+                menu={{ items: downloadOptions }}
+                trigger={['click']}
+                placement='topLeft'
+              >
+                <Button
+                  type='text'
+                  icon={
+                    <Ellipsis
+                      size={20}
+                      className='text-shark-600 dark:text-shark-50'
+                    />
+                  }
+                />
+              </Dropdown>
+              {/* <Button onClick={handleCopyCss}>Copiar CSS</Button> */}
+            </div>
             {[
               { hsl: hsl1, setHsl: setHsl1, title: 'Cor 1', color: color1 },
               { hsl: hsl2, setHsl: setHsl2, title: 'Cor 2', color: color2 },
@@ -323,31 +357,6 @@ export const GradientGenerator = () => {
                 />
               </div>
             )}
-
-            <div className='flex gap-4'>
-              <Button
-                icon={<RefreshCw size={16} />}
-                onClick={generateRandomColors}
-              >
-                Cores Aleatórias
-              </Button>
-              <Dropdown
-                menu={{ items: downloadOptions }}
-                trigger={['click']}
-                placement='topLeft'
-              >
-                <Button
-                  type='text'
-                  icon={
-                    <Ellipsis
-                      size={20}
-                      className='text-shark-600 dark:text-shark-50'
-                    />
-                  }
-                />
-              </Dropdown>
-              {/* <Button onClick={handleCopyCss}>Copiar CSS</Button> */}
-            </div>
           </div>
 
           {/* Visualização para Desktop */}
