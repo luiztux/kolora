@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/kolora/dev-sw.js?dev-sw', { scope: '/kolora/', type: 'classic' })

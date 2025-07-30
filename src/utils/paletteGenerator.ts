@@ -68,7 +68,7 @@ export const generatePaletteFromColor = (baseColor: string): ColorScale | null =
   try {
     parsed = parse(baseColor);
   } catch (e) {
-    return null;
+    return null; // Retorna nulo se a cor for inválida
   }
 
   if (!parsed) {
@@ -76,36 +76,39 @@ export const generatePaletteFromColor = (baseColor: string): ColorScale | null =
   }
 
   const oklch = toOklch(parsed);
-  if (!oklch || oklch.h === undefined) {
-    // Se não for possível obter um matiz (ex: cinzas), não podemos gerar uma paleta colorida.
-    // Poderíamos gerar uma escala de cinzas aqui, mas por enquanto retornamos nulo.
-    return null;
+  if (!oklch) {
+    return null; // Não deveria acontecer se o parse funcionou, mas é uma boa prática
   }
 
-  const { l: targetL, c: targetC, h } = oklch;
+  // Trata cores sem matiz (como cinzas) definindo um matiz padrão e tratando como acromático
+  const h = oklch.h ?? 0;
+  const isAchromatic = oklch.h === undefined || oklch.c < 0.005;
 
-  // 1. Encontrar o "step" da escala mais próximo em luminosidade (L)
+  const { l: targetL, c: targetC } = oklch;
+
+  // 1. Encontra o "step" da escala mais próximo em luminosidade (L)
   const closestStep = (Object.keys(SCALE_MAP) as unknown as (keyof typeof SCALE_MAP)[]).reduce((prev, curr) => {
     return Math.abs(SCALE_MAP[curr].l - targetL) < Math.abs(SCALE_MAP[prev].l - targetL) ? curr : prev;
   });
 
-  // 2. Calcular o "desvio" (offset) da cor do usuário em relação à escala padrão
+  // 2. Calcula o "desvio" (offset) da cor do usuário em relação à escala padrão
   const lOffset = targetL - SCALE_MAP[closestStep].l;
-  const cOffset = targetC - SCALE_MAP[closestStep].c;
+  const cOffset = isAchromatic ? 0 : targetC - SCALE_MAP[closestStep].c;
 
   const newScale: Partial<ColorScale> = {};
 
-  // 3. Gerar a nova escala ajustando L e C de cada step com o offset
+  // 3. Gera a nova escala ajustando L e C de cada step com o offset
   for (const [step, { l: baseL, c: baseC }] of Object.entries(SCALE_MAP)) {
     const key = Number(step) as keyof typeof SCALE_MAP;
 
     const newL = baseL + lOffset;
-    const newC = baseC + cOffset;
+    // Para cores acromáticas, usamos o chroma base da escala de cinza, não o offset
+    const newC = isAchromatic ? baseC * 0.1 : baseC + cOffset;
 
     const newColorOklch: Oklch = {
       mode: 'oklch',
       l: Math.max(0, Math.min(1, newL)), // Garante que L esteja entre 0 e 1
-      c: Math.max(0, newC), // Garante que C não seja negativo
+      c: Math.max(0, newC),             // Garante que C não seja negativo
       h,
     };
 
@@ -114,9 +117,8 @@ export const generatePaletteFromColor = (baseColor: string): ColorScale | null =
     newScale[key] = clampedColor ? formatHex(clampedColor) : '#000000';
   }
 
-  // 4. Inserir a cor original do usuário no step mais próximo para garantir 100% de precisão
+  // 4. Insere a cor original do usuário no step mais próximo para garantir 100% de precisão
   newScale[closestStep] = formatHex(parsed);
-
 
   return newScale as ColorScale;
 };

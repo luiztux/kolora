@@ -120,22 +120,34 @@ export const Home = () => {
   }, [generateNewPalette]);
 
 useEffect(() => {
-  if (customColor) {
-    const newPalette = generatePaletteFromColor(customColor);
-    if (newPalette) {
-      const parsed = parse(customColor);
-      const oklch = parsed ? toOklch(parsed) : null;
+  const debounceTimeout = setTimeout(() => {
+    if (!customColor) {
+      setCustomPalette(null);
+      return;
+    }
 
-      if (oklch && typeof oklch.h === 'number') {
-        const grayScale = generateColorScale(oklch.h, 0.05);
-        setCustomPalette({ primary: newPalette, gray: grayScale });
-      } else {
-        setCustomPalette(null);
-      }
+    const parsedColor = parse(customColor);
+    if (!parsedColor) {
+      setCustomPalette(null);
+      return;
+    }
+
+    const primaryPalette = generatePaletteFromColor(customColor);
+
+    if (primaryPalette) {
+      const oklchColor = toOklch(parsedColor);
+      // Usa o matiz da cor, ou 0 se for acromático (matiz indefinido)
+      const hueForGray = oklchColor?.h ?? 0;
+      const grayScale = generateColorScale(hueForGray, 0.05);
+      setCustomPalette({ primary: primaryPalette, gray: grayScale });
     } else {
       setCustomPalette(null);
     }
-  }
+  }, 300);
+
+  return () => {
+    clearTimeout(debounceTimeout);
+  };
 }, [customColor]);
 
 
