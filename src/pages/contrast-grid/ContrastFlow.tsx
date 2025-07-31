@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import { useMemo, useEffect } from 'react';
 import {
   ReactFlow,
   useNodesState,
@@ -20,14 +20,14 @@ import dagre from 'dagre';
 
 import '@xyflow/react/dist/style.css';
 
-// --- Utility Functions ---
+// --- funções utilitárias ---
 const getWCAGCompliance = (ratio: number) => {
   if (ratio >= 7.0) return 'AAA';
   if (ratio >= 4.5) return 'AA';
   return 'Fail';
 };
 
-// Sanitize color strings to be used as valid HTML IDs
+// Sanitiza sequências de cores para serem usadas como IDs HTML válidas
 const sanitizeColorId = (color: string) => 
   color.replace(/#/g, 'hex').replace(/[^a-zA-Z0-9]/g, '_');
 
@@ -77,7 +77,7 @@ const getLayoutedElements = (
   return { nodes: layoutedNodes, edges };
 };
 
-// --- Type Definitions ---
+// --- definições de tipagem ---
 interface ColorNodeData extends Record<string, unknown> {
   label: string;
   color: string;
@@ -87,7 +87,7 @@ interface ColorNodeData extends Record<string, unknown> {
 // Tipo para o nó completo
 type ColorNode = Node<ColorNodeData>;
 
-// --- Custom Node Component ---
+
 const ColorNodeComponent = ({ data }: NodeProps<ColorNode>) => {
   const colorName = useMemo(() => {
     try {
@@ -165,12 +165,12 @@ const ColorNodeComponent = ({ data }: NodeProps<ColorNode>) => {
   );
 };
 
-// NodeTypes corrigido
+
 const nodeTypes = {
   colorNode: ColorNodeComponent,
 } as const;
 
-// --- Main Flow Component ---
+
 interface ContrastFlowProps {
   allColors: string[];
 }
@@ -220,12 +220,12 @@ export const ContrastFlow = ({ allColors }: ContrastFlowProps) => {
       colorMap.get(colorB)!.push({ color: colorA, ratio });
     });
 
-    // Filtrar apenas cores que têm pelo menos uma conexão
+    // Filtra apenas cores que têm pelo menos uma conexão
     const connectedColors = Array.from(colorMap.keys()).filter(
       color => colorMap.get(color)!.length > 0
     );
 
-    // Encontrar componentes conectados usando DFS
+    // Encontra componentes conectados usando DFS
     const visited = new Set<string>();
     const components: string[][] = [];
 
@@ -241,7 +241,7 @@ export const ContrastFlow = ({ allColors }: ContrastFlowProps) => {
       });
     };
 
-    // Encontrar todos os componentes conectados
+    // Encontra todos os componentes conectados
     connectedColors.forEach(color => {
       if (!visited.has(color)) {
         const component: string[] = [];
@@ -252,21 +252,21 @@ export const ContrastFlow = ({ allColors }: ContrastFlowProps) => {
       }
     });
 
-    // Se não há componentes conectados, mostrar mensagem
+    // Se não há componentes conectados, mostra mensagem
     if (components.length === 0) {
       setNodes([]);
       setEdges([]);
       return;
     }
 
-    // Usar apenas as cores dos maiores componentes conectados
+    // Usa apenas as cores dos maiores componentes conectados
     // Distribui os nós considerando múltiplos componentes
     let allCalculatedNodes: ColorNode[] = [];
     let allCalculatedEdges: Edge[] = [];
     let globalYOffset = 0;
 
     components.forEach((component) => {
-      // Criar nós temporários para este componente (posições serão calculadas pelo Dagre)
+      // Cria nós temporários para este componente (posições serão calculadas pelo Dagre)
       const componentNodes: ColorNode[] = component.map((color) => ({
         id: sanitizeColorId(color),
         type: 'colorNode',
@@ -278,7 +278,7 @@ export const ContrastFlow = ({ allColors }: ContrastFlowProps) => {
         },
       }));
 
-      // Criar edges para este componente
+      // Cria edges para este componente
       const nodeIds = new Set(componentNodes.map(node => node.id));
       const componentEdges: Edge[] = accessiblePairs
         .filter(({ colorA, colorB }) => {
@@ -305,14 +305,14 @@ export const ContrastFlow = ({ allColors }: ContrastFlowProps) => {
           };
         });
 
-      // Aplicar layout do Dagre para este componente
+      // Aplica layout do Dagre para este componente
       const { nodes: layoutedNodes } = getLayoutedElements(
         componentNodes, 
         componentEdges,
         'TB' // Top to Bottom
       );
 
-      // Ajustar posições Y para evitar sobreposição entre componentes
+      // Ajusta posições Y para evitar sobreposição entre componentes
       const adjustedNodes = layoutedNodes.map(node => ({
         ...node,
         position: {
@@ -321,7 +321,7 @@ export const ContrastFlow = ({ allColors }: ContrastFlowProps) => {
         },
       }));
 
-      // Calcular altura deste componente para o próximo offset
+      // Calcula altura deste componente para o próximo offset
       const maxY = Math.max(...adjustedNodes.map(node => node.position.y));
       const minY = Math.min(...adjustedNodes.map(node => node.position.y));
       const componentHeight = maxY - minY + 200; // 200px de margem entre componentes

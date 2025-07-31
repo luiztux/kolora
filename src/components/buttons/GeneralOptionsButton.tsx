@@ -1,6 +1,7 @@
 import { FloatButton, message } from 'antd';
 import {
   Brush,
+  Bubbles,
   Grid3x3,
   Eye,
   Blend,
@@ -114,6 +115,11 @@ export const GeneralOptionsButton = () => {
         icon: <Brush size={15} className='text-shark-600' />,
         label: 'Gerar Paleta',
         action: generateNewPalette,
+      },
+      {
+        icon: <Bubbles size={15} className='text-shark-600' />,
+        label: 'Liquid Glass Playground',
+        href: '/liquid-glass-playground',
       },
       {
         icon: <SwatchBook size={15} className='text-shark-600' />,
