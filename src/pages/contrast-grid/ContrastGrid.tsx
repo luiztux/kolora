@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { wcagContrast, parse } from 'culori';
 import { getContrastingTextColor } from '../../utils/paletteGenerator';
-import { RefreshCw } from 'lucide-react';
-import { App, Button, Breadcrumb, Select } from 'antd';
+import { LayoutGrid, RefreshCw, Workflow } from 'lucide-react';
+import { App, Button, Breadcrumb, Select, Tooltip } from 'antd';
 import { Header, GeneralOptionsButton } from '../../components/Components';
 import { usePaletteContext } from '../../contexts/palette/PaletteContext';
 import colorNamer from 'color-namer';
+import { ContrastFlow } from './ContrastFlow';
 import { Link } from 'react-router-dom';
 
 // Função para verificar a conformidade WCAG
@@ -36,6 +37,15 @@ export const ContrastGrid = () => {
   const [selectedBaseColor, setSelectedBaseColor] = useState<string>(
     allColors[0]
   );
+  const [visualizationType, setVisualizationType] = useState<'grid' | 'flow'>(
+    'grid'
+  );
+
+  const handleChangeVisualizationType = () => {
+    setVisualizationType((prevVisualization) =>
+      prevVisualization === 'grid' ? 'flow' : 'grid'
+    );
+  };
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -106,93 +116,116 @@ export const ContrastGrid = () => {
             </Button>
           </div>
 
-          <div className='mb-6'>
-            <span
-              className='block text-lg font-semibold mb-2 dark:text-shark-50'
-              style={{ color: palette.gray[700] }}
-            >
-              Cor Base para Análise:
-            </span>
-            <Select
-              className='w-full md:w-1/4'
-              showSearch
-              placeholder='Selecione uma cor para analisar'
-              optionFilterProp='children'
-              onChange={(value) => setSelectedBaseColor(value)}
-              value={selectedBaseColor}
-              options={allColors.map((color) => ({
-                value: color,
-                label: `${
-                  colorNamer(color).html[0].name
-                } (${color.toUpperCase()})`,
-              }))}
-              filterOption={(input, option) =>
-                (option?.label ?? '')
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-            />
+          <div className='mb-6 flex justify-between items-center'>
+            <div className={`grow ${visualizationType === 'flow' ? 'hidden' : ''}`}>
+              <span
+                className='block text-lg font-semibold mb-2 dark:text-shark-50'
+                style={{ color: palette.gray[700] }}
+              >
+                Cor Base para Análise:
+              </span>
+              <Select
+                className='w-full md:w-1/4'
+                showSearch
+                placeholder='Selecione uma cor para analisar'
+                optionFilterProp='children'
+                onChange={(value) => setSelectedBaseColor(value)}
+                value={selectedBaseColor}
+                options={allColors.map((color) => ({
+                  value: color,
+                  label: `${
+                    colorNamer(color).html[0].name
+                  } (${color.toUpperCase()})`,
+                }))}
+                filterOption={(input, option) =>
+                  (option?.label ?? '')
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+              />
+            </div>
+            <div>
+              <Tooltip
+                title={`Ver como ${
+                  visualizationType === 'grid' ? 'fluxo' : 'card'
+                }`}
+              >
+                <Button
+                  ghost
+                  className='border-none text-shark-600'
+                  icon={
+                    visualizationType === 'grid' ? (
+                      <Workflow size={20} />
+                    ) : (
+                      <LayoutGrid size={20} />
+                    )
+                  }
+                  onClick={handleChangeVisualizationType}
+                />
+              </Tooltip>
+            </div>
           </div>
 
-          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
-            {allColors.map((targetColor, index) => {
-              // Garante que as cores sejam strings válidas antes de realizar parse
-              const baseColorParsed = parse(selectedBaseColor || '#000000');
-              const targetColorParsed = parse(targetColor || '#000000');
+          {visualizationType === 'grid' ? (
+            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
+              {allColors.map((targetColor, index) => {
+                const baseColorParsed = parse(selectedBaseColor || '#000000');
+                const targetColorParsed = parse(targetColor || '#000000');
 
-              // Se alguma cor não puder ser parseada, usa um valor padrão para evitar erros
-              const ratio =
-                baseColorParsed && targetColorParsed
-                  ? wcagContrast(baseColorParsed, targetColorParsed)
-                  : 0; // Retorna 0 se as cores não forem válidas
+                const ratio =
+                  baseColorParsed && targetColorParsed
+                    ? wcagContrast(baseColorParsed, targetColorParsed)
+                    : 0;
 
-              const compliance = getWCAGCompliance(ratio);
-              const textColorForCard =
-                getContrastingTextColor(selectedBaseColor);
+                const compliance = getWCAGCompliance(ratio);
+                const textColorForCard = getContrastingTextColor(selectedBaseColor);
 
-              return (
-                <div
-                  key={index}
-                  className='p-4 rounded-lg shadow-md flex flex-col items-center justify-center text-center'
-                  style={{
-                    backgroundColor: selectedBaseColor,
-                    color: textColorForCard,
-                  }}
-                >
+                return (
                   <div
-                    className='w-full h-16 rounded-md mb-2 flex items-center justify-center cursor-pointer'
+                    key={index}
+                    className='p-4 rounded-lg shadow-md flex flex-col items-center justify-center text-center'
                     style={{
-                      backgroundColor: targetColor,
-                      color: getContrastingTextColor(targetColor),
+                      backgroundColor: selectedBaseColor,
+                      color: textColorForCard,
                     }}
-                    onClick={() => handleCopyColor(targetColor)}
                   >
-                    <span className='font-bold text-lg'>
-                      {targetColor.toUpperCase()}
+                    <div
+                      className='w-full h-16 rounded-md mb-2 flex items-center justify-center cursor-pointer'
+                      style={{
+                        backgroundColor: targetColor,
+                        color: getContrastingTextColor(targetColor),
+                      }}
+                      onClick={() => handleCopyColor(targetColor)}
+                    >
+                      <span className='font-bold text-lg'>
+                        {targetColor.toUpperCase()}
+                      </span>
+                    </div>
+                    <p className='text-sm font-semibold'>
+                      Bg: {colorNamer(selectedBaseColor).html[0].name}
+                    </p>
+                    <p className='text-sm font-semibold mb-2'>
+                      Text: {colorNamer(targetColor).html[0].name}
+                    </p>
+                    <p className='text-lg font-bold'>{ratio.toFixed(2)}:1</p>
+                    <span
+                      className={`font-bold text-base ${
+                        compliance === 'AAA'
+                          ? 'text-green-500'
+                          : compliance === 'AA'
+                          ? 'text-yellow-500'
+                          : 'text-red-500'
+                      }`}
+                    >
+                      {compliance}
                     </span>
                   </div>
-                  <p className='text-sm font-semibold'>
-                    Bg: {colorNamer(selectedBaseColor).html[0].name}
-                  </p>
-                  <p className='text-sm font-semibold mb-2'>
-                    Text: {colorNamer(targetColor).html[0].name}
-                  </p>
-                  <p className='text-lg font-bold'>{ratio.toFixed(2)}:1</p>
-                  <span
-                    className={`font-bold text-base ${
-                      compliance === 'AAA'
-                        ? 'text-green-500'
-                        : compliance === 'AA'
-                        ? 'text-yellow-500'
-                        : 'text-red-500'
-                    }`}
-                  >
-                    {compliance}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <ContrastFlow allColors={allColors} />
+          )}
         </main>
       </div>
     </>

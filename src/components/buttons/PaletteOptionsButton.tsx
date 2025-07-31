@@ -22,6 +22,7 @@ interface PaletteOptionsButtonProps {
   };
 }
 
+
 export const PaletteOptionsButton = ({
   palette: paletteFromProp,
 }: PaletteOptionsButtonProps) => {
@@ -53,6 +54,7 @@ export const PaletteOptionsButton = ({
   navigator.clipboard.writeText(formatted);
   messageApi.success('Paleta copiada');
 };
+
 
 
   const options: MenuProps['items'] = [
@@ -121,14 +123,16 @@ export const PaletteOptionsButton = ({
   ];
 
   return (
-    <Dropdown menu={{ items: options }} trigger={['click']} placement='topLeft'>
-      <Button
-        type='text'
-        icon={
-          <Ellipsis size={20} className='text-shark-600 dark:text-shark-50' />
-        }
-        style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-      />
-    </Dropdown>
-  );
+    <>
+      <Dropdown menu={{ items: options }} trigger={['click']} placement='topLeft'>
+        <Button
+          type='text'
+          icon={
+            <Ellipsis size={20} className='text-shark-600 dark:text-shark-50' />
+          }
+          style={{ padding: 0, height: 'auto', lineHeight: 1 }}
+        />
+      </Dropdown>
+    </>
+);
 };
