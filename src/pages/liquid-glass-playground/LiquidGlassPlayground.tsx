@@ -1,13 +1,36 @@
-import { useState, useEffect } from 'react';
-import { Button, Breadcrumb, Slider, Row, Col, Select } from 'antd';
-import { usePaletteContext } from '../../contexts/palette/PaletteContext';
+import { useState, useEffect, useMemo } from 'react';
+import {
+  App,
+  Button,
+  Breadcrumb,
+  Slider,
+  Row,
+  Col,
+  Select,
+  Modal,
+  Tabs,
+  type TabsProps,
+} from 'antd';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import {
+  usePaletteContext,
+  type TailwindPalette,
+} from '../../contexts/palette/PaletteContext';
 import { GeneralOptionsButton, Header } from '../../components/Components';
-import { getContrastingTextColor } from '../../utils/paletteGenerator';
+import {
+  getContrastingTextColor,
+  type ColorScale,
+} from '../../utils/paletteGenerator';
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Download } from 'lucide-react';
 
-// Utility to convert hex to a usable RGB object
+interface PaletteInterface {
+  palette: TailwindPalette;
+}
+
+// ---------- UTILS ----------
 const hexToRgb = (hex: string) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
@@ -16,37 +39,63 @@ const hexToRgb = (hex: string) => {
         g: parseInt(result[2], 16),
         b: parseInt(result[3], 16),
       }
-    : null; // Return null for invalid hex formats
+    : null;
 };
 
+// ---------- EXTRA COMPONENTS ----------
+export const PalettePreview = ({ palette }: PaletteInterface) => {
+  const colorGroups = Object.entries(palette) as [string, ColorScale][];
+  const { message: messageApi } = App.useApp();
+
+  const handleCopyColor = (color: string) => {
+    navigator.clipboard.writeText(color);
+    messageApi.success(`Color ${color.toUpperCase()} copied!`);
+  };
+
+  return (
+    <div className='flex flex-col gap-4 mt-4'>
+      {colorGroups.map(([name, scale]) => (
+        <div key={name}>
+          <h4 className='font-semibold text-sm capitalize mb-2 dark:text-shark-50'>
+            {name}
+          </h4>
+          <div className='flex gap-2'>
+            {Object.values(scale).map((color, i) => (
+              <div
+                key={i}
+                className='w-12 h-12 rounded-md shadow-md flex items-center justify-center text-[10px] font-mono cursor-pointer'
+                style={{
+                  backgroundColor: color,
+                  color: getContrastingTextColor(color as string),
+                }}
+                onClick={() => handleCopyColor(color as string)}
+              >
+                {(color as string).replace('#', '')}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ---------- MAIN COMPONENT ----------
 export const LiquidGlassPlayground = () => {
   const { palette, generateNewPalette } = usePaletteContext();
+  const { message: messageApi } = App.useApp();
   const [blur, setBlur] = useState(10);
   const [opacity, setOpacity] = useState(0.5);
   const [saturation, setSaturation] = useState(120);
   const [effect, setEffect] = useState('linear');
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code === 'Space') {
-        event.preventDefault();
-        generateNewPalette();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [generateNewPalette]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const previewBackgroundColor = palette.primary[500] || '#1a73e8';
   const cardTextColor = getContrastingTextColor(palette.gray[100] || '#f1f3f4');
-
-  // --- Adaptive Effect Colors ---
   const effectBaseColor = getContrastingTextColor(previewBackgroundColor);
   const effectRgb = hexToRgb(effectBaseColor);
   const isBackgroundLight = effectBaseColor === '#000000';
 
-  // Parallax motion
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotateX = useTransform(y, [-50, 50], [10, -10]);
@@ -55,25 +104,20 @@ export const LiquidGlassPlayground = () => {
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       const { innerWidth, innerHeight } = window;
-      const offsetX = e.clientX - innerWidth / 2;
-      const offsetY = e.clientY - innerHeight / 2;
-      x.set(offsetX / 20);
-      y.set(offsetY / 20);
+      x.set((e.clientX - innerWidth / 2) / 20);
+      y.set((e.clientY - innerHeight / 2) / 20);
     };
-
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [x, y]);
 
-  /** Renders the extra visual effect layer */
   const renderEffectLayer = () => {
-    if (!effectRgb) return null; // Don't render if the base color is invalid
-
+    if (!effectRgb) return null;
     switch (effect) {
       case 'linear':
         return (
           <motion.div
-            key={effect} // Force re-mount on effect change
+            key={effect}
             animate={{ x: ['-150%', '150%'] }}
             transition={{
               duration: 4,
@@ -93,12 +137,11 @@ export const LiquidGlassPlayground = () => {
         );
 
       case 'wave': {
-        // Use vibrant colors from the palette for the wave effect
         const waveColor1 = palette.primary[400] || 'rgba(0, 255, 255, 0.5)';
         const waveColor2 = palette.primary[600] || 'rgba(255, 0, 255, 0.5)';
         return (
           <motion.div
-            key={effect} // Force re-mount on effect change
+            key={effect}
             animate={{ backgroundPositionX: ['0%', '200%'] }}
             transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
             style={{
@@ -107,7 +150,7 @@ export const LiquidGlassPlayground = () => {
               backgroundImage: `radial-gradient(circle at 50% 50%, ${waveColor1} 0%, ${waveColor2} 60%)`,
               backgroundRepeat: 'repeat-x',
               backgroundSize: '200px 200px',
-              mixBlendMode: isBackgroundLight ? 'multiply' : 'screen', // Adapt blend mode
+              mixBlendMode: isBackgroundLight ? 'multiply' : 'screen',
               maskImage:
                 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
               WebkitMaskImage:
@@ -120,7 +163,7 @@ export const LiquidGlassPlayground = () => {
       case 'aurora':
         return (
           <motion.div
-            key={effect} // Force re-mount on effect change
+            key={effect}
             animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }}
             transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
             style={{
@@ -165,14 +208,108 @@ export const LiquidGlassPlayground = () => {
     }
   };
 
+  const codeSnippets = useMemo(
+    () => ({
+      cssVariables: `
+:root {
+  --glass-blur: ${blur}px;
+  --glass-opacity: ${opacity.toFixed(2)};
+  --glass-saturation: ${saturation}%;
+}
+
+.your-element {
+  background: rgba(255, 255, 255, var(--glass-opacity));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+    `,
+      plainCss: `
+.liquid-glass-effect {
+  background: rgba(255, 255, 255, ${opacity.toFixed(2)});
+  backdrop-filter: blur(${blur}px) saturate(${saturation}%);
+  -webkit-backdrop-filter: blur(${blur}px) saturate(${saturation}%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+    `,
+      jsObject: `
+const glassStyle = {
+  background: 'rgba(255, 255, 255, ${opacity.toFixed(2)})',
+  backdropFilter: 'blur(${blur}px) saturate(${saturation}%)',
+  WebkitBackdropFilter: 'blur(${blur}px) saturate(${saturation}%)',
+  border: '1px solid rgba(255, 255, 255, 0.2)',
+};
+    `,
+    }),
+    [blur, opacity, saturation]
+  );
+
+  const handleCopyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text.trim());
+    messageApi.success('Código copiado');
+  };
+
+  const tabItems: TabsProps['items'] = [
+    {
+      key: 'CSS Variables',
+      label: 'CSS Variables',
+      children: (
+        <>
+          <SyntaxHighlighter language='css' style={vscDarkPlus}>
+            {codeSnippets.cssVariables.trim()}
+          </SyntaxHighlighter>
+          <Button
+            className='mt-4'
+            onClick={() => handleCopyToClipboard(codeSnippets.cssVariables)}
+          >
+            Copiar código
+          </Button>
+        </>
+      ),
+    },
+    {
+      key: 'Plain CSS',
+      label: 'Plain CSS',
+      children: (
+        <>
+          <SyntaxHighlighter language='css' style={vscDarkPlus}>
+            {codeSnippets.plainCss.trim()}
+          </SyntaxHighlighter>
+          <Button
+            className='mt-4'
+            onClick={() => handleCopyToClipboard(codeSnippets.plainCss)}
+          >
+            Copiar código
+          </Button>
+        </>
+      ),
+    },
+    {
+      key: 'JSON',
+      label: 'JSON',
+      children: (
+        <>
+          <SyntaxHighlighter language='javascript' style={vscDarkPlus}>
+            {codeSnippets.jsObject.trim()}
+          </SyntaxHighlighter>
+          <Button
+            className='mt-4'
+            onClick={() => handleCopyToClipboard(codeSnippets.jsObject)}
+          >
+            Copiar código
+          </Button>
+        </>
+      ),
+    },
+  ];
+
   return (
     <>
       <GeneralOptionsButton />
-      <div className='min-h-screen bg-gray-100 dark:bg-shark-800'>
+      <div className='min-h-screen bg-gray-100 dark:bg-shark-800 relative'>
         <div className='sticky top-0 z-50 bg-white dark:bg-shark-800 shadow-sm'>
           <Header />
         </div>
-
         <div className='px-4 my-4'>
           <Breadcrumb
             items={[
@@ -193,7 +330,6 @@ export const LiquidGlassPlayground = () => {
             ]}
           />
         </div>
-
         <main className='container px-4 py-8'>
           <div className='flex justify-between items-center mb-10'>
             <h1 className='text-3xl font-semibold mb-6 dark:text-shark-50'>
@@ -213,7 +349,6 @@ export const LiquidGlassPlayground = () => {
             </Button>
           </div>
           <Row gutter={[32, 32]}>
-            {/* Controls Panel */}
             <Col xs={24} md={12}>
               <div className='flex flex-col gap-6'>
                 <div>
@@ -268,10 +403,17 @@ export const LiquidGlassPlayground = () => {
                     ]}
                   />
                 </div>
+                <Button
+                  type='default'
+                  icon={<Download size={16} />}
+                  onClick={() => setIsModalVisible(true)}
+                >
+                  Exportar efeito
+                </Button>
+                <PalettePreview palette={palette} />
               </div>
             </Col>
-
-            {/* Preview with Liquid Glass effect */}
+            {/* Preview com Liquid Glass */}
             <Col xs={24} md={12}>
               <div
                 className='h-96 rounded-lg flex items-center justify-center p-8'
@@ -325,6 +467,15 @@ export const LiquidGlassPlayground = () => {
           </Row>
         </main>
       </div>
+      <Modal
+        title='Export Glassmorphism Effect'
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <Tabs defaultActiveKey='1' items={tabItems} />
+      </Modal>
     </>
   );
 };
