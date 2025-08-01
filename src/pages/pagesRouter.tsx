@@ -6,6 +6,7 @@ import {
   GradientGenerator,
   ColorConverter,
   LiquidGlassPlayground,
+  NeobrutalismPlayground,
 } from './Pages';
 
 type PagesRouterType = {
@@ -49,5 +50,10 @@ export const pagesRouter: PagesRouterType[] = [
     element: <LiquidGlassPlayground />,
     path: '/liquid-glass-playground',
     title: 'Liquid Glass Playground',
+  },
+  {
+    element: <NeobrutalismPlayground />,
+    path: '/neobrutalism-playground',
+    title: 'Neobrutalism Playground',
   },
 ];

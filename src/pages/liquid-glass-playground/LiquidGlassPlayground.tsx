@@ -59,7 +59,7 @@ export const PalettePreview = ({ palette }: PaletteInterface) => {
           <h4 className='font-semibold text-sm capitalize mb-2 dark:text-shark-50'>
             {name}
           </h4>
-          <div className='flex gap-2'>
+          <div className='grid grid-cols-4 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-3'>
             {Object.values(scale).map((color, i) => (
               <div
                 key={i}
@@ -331,7 +331,7 @@ const glassStyle = {
           />
         </div>
         <main className='container px-4 py-8'>
-          <div className='flex justify-between items-center mb-10'>
+          <div className='flex flex-col md:flex-row justify-between items-center mb-10'>
             <h1 className='text-3xl font-semibold mb-6 dark:text-shark-50'>
               Liquid Glass Playground
             </h1>
@@ -349,6 +349,58 @@ const glassStyle = {
             </Button>
           </div>
           <Row gutter={[32, 32]}>
+            {/* Preview com Liquid Glass mobile */}
+            <Col xs={24} md={12} className='md:hidden block'>
+              <div
+                className='h-96 rounded-lg flex items-center justify-center p-8'
+                style={{ backgroundColor: previewBackgroundColor }}
+              >
+                <motion.div
+                  style={{
+                    perspective: 1000,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100%',
+                  }}
+                >
+                  <motion.div
+                    style={{
+                      rotateX,
+                      rotateY,
+                      transformStyle: 'preserve-3d',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 300,
+                        height: 200,
+                        color: cardTextColor,
+                        background: `rgba(255, 255, 255, ${opacity})`,
+                        backdropFilter: `blur(${blur}px) saturate(${saturation}%)`,
+                        WebkitBackdropFilter: `blur(${blur}px) saturate(${saturation}%)`,
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: 20,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+                      }}
+                    >
+                      {renderEffectLayer()}
+                      <div className='relative z-10 p-4'>
+                        <h3 className='text-xl font-bold text-liquid-glass'>
+                          Liquid Glass
+                        </h3>
+                        <p className='text-liquid-glass'>
+                          Movimente o mouse e ajuste os sliders!
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              </div>
+            </Col>
+
             <Col xs={24} md={12}>
               <div className='flex flex-col gap-6'>
                 <div>
@@ -389,12 +441,12 @@ const glassStyle = {
                 </div>
                 <div>
                   <label className='font-semibold block mb-2 dark:text-shark-200'>
-                    Visual Effect
+                    Efeito Visual
                   </label>
                   <Select
                     value={effect}
                     onChange={setEffect}
-                    className='w-1/3'
+                    className='w-1/2 md:w-1/3'
                     options={[
                       { label: 'Linear Reflex', value: 'linear' },
                       { label: 'Wave', value: 'wave' },
@@ -413,8 +465,8 @@ const glassStyle = {
                 <PalettePreview palette={palette} />
               </div>
             </Col>
-            {/* Preview com Liquid Glass */}
-            <Col xs={24} md={12}>
+            {/* Preview com Liquid Glass desktop */}
+            <Col xs={24} md={12} className='hidden md:block'>
               <div
                 className='h-96 rounded-lg flex items-center justify-center p-8'
                 style={{ backgroundColor: previewBackgroundColor }}

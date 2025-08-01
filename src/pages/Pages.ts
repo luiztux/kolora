@@ -5,3 +5,4 @@ export * from './color-wheel/ColorWheelPage';
 export * from './gradient-generator/GradientGenerator';
 export * from './color-converter/ColorConverter';
 export * from './liquid-glass-playground/LiquidGlassPlayground';
+export * from './neobrutalism-playground/NeobrutalismPlayground';

@@ -7,8 +7,9 @@ import {
   Blend,
   House,
   PaintRoller,
+  Proportions,
   Layers,
-  SwatchBook
+  SwatchBook,
 } from 'lucide-react';
 import { usePaletteContext } from '../../contexts/Contexts';
 import { useMemo, useRef, useCallback } from 'react';
@@ -115,6 +116,11 @@ export const GeneralOptionsButton = () => {
         icon: <Brush size={15} className='text-shark-600' />,
         label: 'Gerar Paleta',
         action: generateNewPalette,
+      },
+      {
+        icon: <Proportions size={15} className='text-shark-600' />,
+        label: 'Neobrutalism Playground',
+        href: '/neobrutalism-playground',
       },
       {
         icon: <Bubbles size={15} className='text-shark-600' />,
